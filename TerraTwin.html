@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>TerraTwin</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+    <style>
+        :root {
+            --o: #f0821a;
+            --b: #2fb0f5;
+            --ink: #e6e8ee;
+            --mute: #aab0bf
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent
+        }
+
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+            background: #02030a;
+            color: var(--ink);
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Arial, sans-serif
+        }
+
+        .app {
+            position: relative;
+            max-width: 430px;
+            height: 100dvh;
+            margin: 0 auto;
+            overflow: hidden;
+            background: radial-gradient(70% 45% at 100% 100%, rgba(47, 176, 245, .2), transparent 65%), radial-gradient(50% 30% at 100% 35%, rgba(240, 110, 70, .12), transparent 70%), #04060c
+        }
+
+        .app::after {
+            content: "";
+            position: absolute;
+            top: 34%;
+            right: -25%;
+            width: 70%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(240, 110, 70, .8));
+            transform: rotate(-38deg);
+            pointer-events: none
+        }
+
+        .screen {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity .35s
+        }
+
+        .screen.on {
+            display: flex
+        }
+
+        .screen.show {
+            opacity: 1
+        }
+
+        .scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: max(18px, env(safe-area-inset-top)) 22px 36px;
+            position: relative;
+            z-index: 1
+        }
+
+        .center {
+            align-items: center;
+            justify-content: center;
+            text-align: center
+        }
+
+        .back {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 0;
+            background: rgba(214, 140, 96, .85);
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            margin-bottom: 26px;
+            flex: none
+        }
+
+        h1 {
+            font-size: 34px;
+            line-height: 1.15;
+            margin: 0 0 12px
+        }
+
+        .sub {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 28px;
+            color: #d4d6dd
+        }
+
+        .word {
+            font-size: 46px;
+            font-weight: 700;
+            letter-spacing: .5px;
+            margin: 14px 0 6px
+        }
+
+        .word b {
+            color: #e8793a
+        }
+
+        .word span {
+            color: var(--b)
+        }
+
+        .tag {
+            font-size: 19px;
+            font-weight: 600;
+            color: #cfd2da;
+            max-width: 300px;
+            line-height: 1.35
+        }
+
+        .logo {
+            width: 230px;
+            max-width: 60%
+        }
+
+        .go {
+            margin-top: 34px;
+            width: 260px;
+            height: 62px;
+            border: 0;
+            border-radius: 40px;
+            font: 700 20px Inter, sans-serif;
+            color: #fff;
+            background: linear-gradient(#f58f22, #e9780f);
+            box-shadow: 0 6px 22px rgba(240, 130, 26, .35);
+            cursor: pointer
+        }
+
+        .card {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            width: 100%;
+            padding: 26px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 34px;
+            background: rgba(62, 62, 64, .92);
+            color: var(--ink);
+            font: 700 22px Inter, sans-serif;
+            text-align: left;
+            cursor: pointer
+        }
+
+        .card img {
+            width: 96px;
+            height: auto;
+            flex: none
+        }
+
+        .card small {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: #cdd0d8;
+            margin-top: 4px
+        }
+
+        .card.off {
+            background: rgba(34, 34, 36, .9);
+            cursor: not-allowed;
+            color: #8d9099
+        }
+
+        .card.off img {
+            opacity: .85
+        }
+
+        .card.pic {
+            padding: 14px 22px 14px 14px;
+            gap: 18px;
+            font-size: 21px;
+            line-height: 1.25
+        }
+
+        .card.pic img {
+            width: 96px;
+            height: 76px;
+            object-fit: cover;
+            border-radius: 12px
+        }
+
+        .lb {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 78px;
+            padding: 0 24px;
+            margin-bottom: 12px;
+            border: 0;
+            border-radius: 40px;
+            color: #fff;
+            font: 700 18px Inter, sans-serif;
+            text-align: left;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center
+        }
+
+        .lb em {
+            font: 700 32px Inter, sans-serif;
+            font-style: normal
+        }
+
+        .bg,
+        .ov {
+            position: absolute;
+            inset: 0
+        }
+
+        .bg {
+            background-size: cover;
+            background-position: center;
+            filter: blur(9px) saturate(1.1);
+            transform: scale(1.12)
+        }
+
+        .ov {
+            background: linear-gradient(rgba(4, 6, 12, .35), rgba(4, 6, 12, .88))
+        }
+
+        .dh {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 10px
+        }
+
+        .dh .back {
+            margin: 0
+        }
+
+        .dh h2 {
+            margin: 0;
+            font-size: 19px;
+            line-height: 1.2;
+            flex: 1;
+            text-align: center;
+            padding-right: 52px
+        }
+
+        .dh h2 small {
+            display: block;
+            font-size: 17px;
+            font-weight: 600
+        }
+
+        .ring {
+            position: relative;
+            width: 224px;
+            height: 224px;
+            margin: 8px auto 22px
+        }
+
+        .ring svg {
+            transform: rotate(-90deg)
+        }
+
+        .ring div {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-content: center;
+            text-align: center
+        }
+
+        .ring b {
+            font-size: 47px
+        }
+
+        .ring span {
+            font-size: 13px;
+            letter-spacing: .6px
+        }
+
+        .f {
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            border-radius: 26px;
+            background: rgba(20, 24, 32, .55);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, .2)
+        }
+
+        .f h3 {
+            margin: 0;
+            font-size: 20px
+        }
+
+        .f h3 small {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--mute);
+            margin-left: 6px
+        }
+
+        .f .r {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 12px
+        }
+
+        .trk {
+            flex: 1;
+            height: 9px;
+            border-radius: 9px;
+            background: rgba(255, 255, 255, .2);
+            overflow: hidden
+        }
+
+        .trk i {
+            display: block;
+            height: 100%;
+            width: 0;
+            background: #fff;
+            border-radius: 9px;
+            transition: width .9s ease
+        }
+
+        .f .r b {
+            font-size: 16px;
+            min-width: 52px;
+            text-align: right
+        }
+
+        .raw {
+            font-size: 12.5px;
+            color: var(--mute);
+            margin-top: 9px
+        }
+
+        .f.y {
+            background: rgba(111, 191, 58, .82);
+            color: #10200a;
+            border-color: rgba(255, 255, 255, .3)
+        }
+
+        .f.p {
+            background: rgba(224, 200, 42, .85);
+            color: #241f04
+        }
+
+        .f.n {
+            background: rgba(217, 83, 79, .85);
+            color: #fff
+        }
+
+        .f.y .raw,
+        .f.p .raw,
+        .f.y small,
+        .f.p small {
+            color: rgba(0, 0, 0, .65)
+        }
+
+        .f.n .raw,
+        .f.n small {
+            color: rgba(255, 255, 255, .8)
+        }
+
+        .f .v {
+            margin-top: 8px;
+            font-weight: 700;
+            font-size: 17px
+        }
+
+        .note {
+            padding: 14px 18px;
+            margin-bottom: 10px;
+            border-radius: 20px;
+            background: rgba(10, 14, 24, .6);
+            border: 1px solid rgba(255, 255, 255, .15);
+            font-size: 14px;
+            line-height: 1.45
+        }
+
+        .note b {
+            display: block;
+            font-size: 11.5px;
+            letter-spacing: .6px;
+            text-transform: uppercase;
+            color: var(--b);
+            margin-bottom: 3px
+        }
+
+        .src {
+            font-size: 12px;
+            color: var(--mute);
+            line-height: 1.5;
+            margin: 14px 4px 0
+        }
+    </style>
+</head>
+
+<body>
+    <main class="app">
+
+        <section class="screen center" id="splash"><img class="logo" src="assets/TerraTwin transparent logo.png" alt="">
+            <div class="word"><b>TERRA</b><span>Twin</span></div>
+        </section>
+
+        <section class="screen center" id="start"><img class="logo" src="assets/TerraTwin transparent logo.png"
+                alt="TerraTwin logo">
+            <div class="word"><b>TERRA</b><span>Twin</span></div>
+            <p class="tag">Find the Earth that behaves like another world.</p><button class="go"
+                onclick="go('dest')">Start</button>
+        </section>
+
+        <section class="screen" id="dest">
+            <div class="scroll"><button class="back" onclick="back()" aria-label="Back"></button>
+                <h1>Choose a destination</h1>
+                <p class="sub">Where is the mission headed?</p>
+                <button class="card" onclick="go('menu')"><img src="assets/mars.png" alt="">
+                    <div>Mars<small>Target: Jezero Crater</small></div>
+                </button>
+                <button class="card off" disabled><img src="assets/moon.png" alt="">
+                    <div>The Moon<small>Coming Soon</small></div>
+                </button>
+            </div>
+        </section>
+
+        <section class="screen" id="menu">
+            <div class="scroll"><button class="back" onclick="back()" aria-label="Back"></button>
+                <h1>Earth Analogs for Jezero Crater, Mars</h1>
+                <div style="height:18px"></div>
+                <button class="card" onclick="go('list')"><img src="assets/TerraTwin transparent logo.png" alt="">
+                    <div>Choose Analogs</div>
+                </button>
+                <button class="card" onclick="openLB()"><img src="assets/Leaderboard bars logo.png" alt=""
+                        style="width:90px">
+                    <div>Top 5 Analogs Leaderboard</div>
+                </button>
+            </div>
+        </section>
+
+        <section class="screen" id="list">
+            <div class="scroll"><button class="back" onclick="back()" aria-label="Back"></button>
+                <h1>Best Earth Analogs for Mars</h1>
+                <p class="sub" style="font-size:17px">Tap a location to see how it compares to Jezero Crater.</p>
+                <div id="lst"></div>
+            </div>
+        </section>
+
+        <section class="screen" id="lbd">
+            <div class="scroll"><button class="back" onclick="back()" aria-label="Back"></button>
+                <div style="text-align:center"><img src="assets/Leaderboard bars logo.png" alt="" style="width:110px">
+                    <h2 style="font-size:23px;margin:14px 0 4px;color:#d4d6dd;line-height:1.25">The 5 analogs most
+                        similar to Jezero Crater, Mars</h2>
+                    <h1 style="font-size:32px;margin:0 0 6px">Leaderboard</h1>
+                    <p class="sub" style="font-size:15px;margin-bottom:22px">based on average similarity (%)</p>
+                </div>
+                <div id="lbl"></div>
+            </div>
+        </section>
+
+        <section class="screen" id="det">
+            <div class="bg" id="dbg"></div>
+            <div class="ov"></div>
+            <div class="scroll" id="dsc">
+                <div class="dh"><button class="back" onclick="back()" aria-label="Back"></button>
+                    <h2><span id="dn"></span><small>Similarity Score</small></h2>
+                </div>
+                <div class="ring"><svg width="224" height="224" viewBox="0 0 224 224">
+                        <defs>
+                            <linearGradient id="gr" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#0a84ff" />
+                                <stop offset="1" stop-color="#0b3fb3" />
+                            </linearGradient>
+                        </defs>
+                        <circle cx="112" cy="112" r="98" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="20" />
+                        <circle id="arc" cx="112" cy="112" r="98" fill="none" stroke="url(#gr)" stroke-width="20"
+                            stroke-linecap="round" stroke-dasharray="616" stroke-dashoffset="616"
+                            style="transition:stroke-dashoffset 1s ease" />
+                    </svg>
+                    <div><b id="dp"></b><span>AVERAGE SIMILARITY</span></div>
+                </div>
+                <div id="dfs"></div>
+                <div id="dnotes"></div>
+                <p class="src" id="dsrc"></p>
+            </div>
+        </section>
+
+    </main>
+    <script>
+        // ===== DATA: edit values here. similarity is computed from these =====
+        const J = { precip: 0, swing: 55, elev: 2600 };            // Jezero Crater reference (elev = metres below reference level)
+        const Y = 1, P = .5, N = 0;                                // Yes / Partial / No scores
+        const SITES = [
+            {
+                id: "dan", name: "Danakil Depression, Ethiopia", img: "danakil.jpg", g: "#3a4a2a,#c9a227", precip: 150, swing: 13, elev: 120, elevTxt: "120 m below sea level", terrain: Y, minerals: Y,
+                match: "A dry salt basin with carbonate minerals and hot-spring chemistry that researchers compare to Mars.",
+                breaks: "Far hotter than Jezero, with a day-night swing of about 13 °C vs 55 °C. Earth also can't copy Mars's low gravity, thin air or radiation.",
+                helps: "Test life-detection and sampling methods in extreme salt and hot-spring environments.",
+                src: "ESA Earth from Space (Danakil); ACS Earth and Space Chemistry (2018) Dallol paper; AGU Eos; NASA Astrobiology"
+            },
+            {
+                id: "moj", name: "Mojave Desert / Death Valley, California", img: "mojave.jpg", g: "#4f8fd0,#d9a06b", precip: 50, swing: 14, elev: 86, elevTxt: "86 m below sea level", terrain: Y, minerals: Y,
+                match: "Dry lakebed terrain and clay-type minerals, in a low-lying basin like Jezero.",
+                breaks: "It gets about 50 mm of rain a year and swings only 14 °C vs 55 °C. Earth also can't copy Mars's low gravity, thin air or radiation.",
+                helps: "Practice rover navigation and sample collection on dry lakebed ground.",
+                src: "To be added"
+            },
+            {
+                id: "mor", name: "Morocco Sahara margins (Ouarzazate)", img: "morocco.jpg", g: "#b8605a,#6b3340", precip: 108, swing: 14.7, elev: 1136, elevTxt: "1,136 m above sea level", terrain: P, minerals: Y,
+                match: "Arid terrain with clay-rich minerals and partly lakebed-like dry river ground.",
+                breaks: "Wetter than Jezero (108 mm/yr) and sits 1,136 m above sea level. Earth can't copy Mars's low gravity, thin air or radiation.",
+                helps: "Practice mapping clay-rich terrain and planning sampling routes.",
+                src: "Japan Meteorological Agency climate data; ScienceDirect paper"
+            },
+            {
+                id: "kat", name: "Kati Thanda-Lake Eyre, Australia", img: "kati.jpg", g: "#c9855a,#d9a773", precip: 140, swing: 26.5, elev: 15, elevTxt: "15 m below sea level", terrain: Y, minerals: P,
+                match: "A dry lake basin that fills only rarely, the closest match to Jezero's ancient lake story.",
+                breaks: "Wettest site (140 mm/yr) and it floods occasionally, while Jezero's lake vanished billions of years ago. Earth also can't copy Mars's low gravity or thin air.",
+                helps: "Study how lake basins fill, dry out and leave layers, to read Mars's lake deposits.",
+                src: "NASA Earth Observatory (Lake Eyre); NASA MODIS gallery"
+            },
+            {
+                id: "mcm", name: "McMurdo Dry Valleys, Antarctica", img: "McMurdo.webp", g: "#1f4f9e,#7fb0dd 45%,#8d9399", precip: 25, swing: 10, elev: 400, elevTxt: "400 m above sea level", terrain: P, minerals: Y,
+                match: "Very dry (25 mm/yr) with mineral-rich soils and frozen lake basins.",
+                breaks: "Temperature barely swings (10 °C vs 55 °C), and Earth can't copy Mars's low gravity, thin air or radiation.",
+                helps: "Test hardware in extreme cold and practise searching dry, frozen soil for signs of life.",
+                src: "NASA Earth Observatory (McMurdo Dry Valleys); NASA NTRS"
+            },
+            {
+                id: "ata", name: "Atacama Desert, Chile", img: "Atacama.webp", g: "#3d8fd4,#a9d3ee 35%,#c97b4a 70%,#7a3f22", precip: 2, swing: 20, elev: 2300, elevTxt: "2,300 m above sea level", terrain: P, minerals: Y,
+                match: "Almost as dry as Jezero (2 mm/yr vs about 0), with mineral-rich salt flats.",
+                breaks: "Day-night swing is only 20 °C vs 55 °C, and Earth can't copy Mars's low gravity, thin air or radiation.",
+                helps: "Test rover drills and sampling in very dry, mineral-rich ground.",
+                src: "NASA Earth Observatory (Salar de Atacama); NASA NTRS"
+            }
+        ];
+        // similarity (0-100) per factor; overall = average of the five
+        const sim = s => ({ ar: Math.max(0, 100 - s.precip / 10), tp: Math.min(100, s.swing / J.swing * 100), el: Math.min(100, s.elev / J.elev * 100), te: s.terrain * 100, mi: s.minerals * 100 });
+        const avg = s => { const v = Object.values(sim(s)).map(x => Math.round(x * 10) / 10); return v.reduce((a, b) => a + b, 0) / 5 };
+        const f1 = n => n.toFixed(1);
+        // ===== app logic =====
+        const $ = id => document.getElementById(id); let stack = [];
+        const CH = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';
+        document.querySelectorAll('.back').forEach(b => b.innerHTML = CH);
+        const asset = s => s.img ? `url(assets/${s.img})` : 'none';
+        function bgFor(s) { return `${asset(s)}${s.img ? ',' : ''}linear-gradient(${s.g})` }
+        function show(id) { document.querySelectorAll('.screen').forEach(e => { e.classList.remove('on', 'show') }); const e = $(id); e.classList.add('on'); requestAnimationFrame(() => requestAnimationFrame(() => e.classList.add('show'))); e.querySelectorAll('.scroll').forEach(x => x.scrollTop = 0) }
+        function go(id) { stack.push(id); show(id) }
+        function back() { stack.pop(); show(stack[stack.length - 1]) }
+        $('lst').innerHTML = SITES.map(s => `<button class="card pic" onclick="openSite('${s.id}')"><img src="${s.img ? 'assets/' + s.img : ''}" alt="" style="background:linear-gradient(${s.g})"><div>${s.name}</div></button>`).join('');
+        function openLB() {
+            const top = [...SITES].sort((a, b) => avg(b) - avg(a)).slice(0, 5);
+            $('lbl').innerHTML = top.map((s, i) => `<button class="lb" onclick="openSite('${s.id}')" style="background-image:linear-gradient(rgba(5,8,16,.55),rgba(5,8,16,.55)),${bgFor(s)}"><span>${i + 1}. ${s.name}</span><em>${f1(avg(s))}%</em></button>`).join('');
+            go('lbd');
+        }
+        function openSite(id) {
+            const s = SITES.find(x => x.id === id), m = sim(s);
+            $('dn').textContent = s.name; $('dp').textContent = f1(avg(s)) + '%';
+            $('dbg').style.backgroundImage = bgFor(s);
+            const bar = (t, sub, v, raw) => `<div class="f"><h3>${t}<small>${sub}</small></h3><div class="r"><div class="trk"><i data-w="${v}"></i></div><b>${f1(v)}%</b></div><div class="raw">${raw}</div></div>`;
+            const cat = (t, sub, v, lab) => { const c = v === 1 ? 'y' : v === .5 ? 'p' : 'n', w = v === 1 ? 'Yes' : v === .5 ? 'Partial' : 'No'; return `<div class="f ${c}"><h3>${t}<small>${sub}</small></h3><div class="v">${w} (${v * 100}%)</div><div class="raw">${lab}</div></div>` };
+            $('dfs').innerHTML = bar('Aridity', 'Avg annual precipitation', m.ar, `${s.precip} mm/yr · Jezero: 0 mm/yr`) + bar('Temperature swing', 'Typical day-night range (°C)', m.tp, `${s.swing} °C · Jezero: ${J.swing} °C`) + bar('Elevation', 'Height of the site (m)', m.el, `${s.elevTxt} · Jezero: ${J.elev.toLocaleString()} m below reference level`) + cat('Terrain type', 'Ancient lakebed or delta?', s.terrain, 'Jezero: Yes') + cat('Surface mineralogy', 'Clay or carbonate minerals?', s.minerals, 'Jezero: Yes');
+            $('dnotes').innerHTML = [['Strong match', s.match], ['Where it breaks down', s.breaks], ['How it helps exploration', s.helps]].map(([t, v]) => `<div class="note"><b>${t}</b>${v}</div>`).join('');
+            $('dsrc').textContent = 'Data sources: ' + s.src;
+            const arc = $('arc'); arc.style.transition = 'none'; arc.setAttribute('stroke-dashoffset', 616);
+            go('det');
+            setTimeout(() => { arc.style.transition = 'stroke-dashoffset 1s ease'; arc.setAttribute('stroke-dashoffset', 616 * (1 - avg(s) / 100)); document.querySelectorAll('[data-w]').forEach(i => i.style.width = i.dataset.w + '%') }, 120);
+        }
+        stack = ['splash']; show('splash'); setTimeout(() => { stack = ['start']; show('start') }, 1800);
+    </script>
+</body>
+
+</html>
