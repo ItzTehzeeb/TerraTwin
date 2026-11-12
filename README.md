@@ -3,6 +3,8 @@
 
 ### _Turning Earth into a training map for space exploration. TerraTwin is a data-driven web application that calculates the similarity between locations on Earth and target destinations on the Moon and Mars. Built for the NASA Space Apps Challenge 2026, TerraTwin helps mission planners identify the best terrestrial analogs for testing space hardware, preventing mission failures caused by inadequate Earth-based testing._
 
+### Link to app: https://itztehzeeb.github.io/TerraTwin/
+
 ## Table of Contents
 - The Challenge
 - Our Solution
