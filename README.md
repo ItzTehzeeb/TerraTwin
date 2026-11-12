@@ -61,7 +61,7 @@ We are a team of six students from Dhaka, Bangladesh, participating in the NASA 
 - Tehzeeb Kabir
 - Rukaiya Tasneem
 - Arham Majid
-- Mahadi Fatema Adrita
+- Mahadi Fatima Adrita
 - Rayna Janan
 
 Built with ❤️ for the NASA Space Apps Challenge 2026. Turning Earth into a training map for the cosmos.
