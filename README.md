@@ -27,6 +27,7 @@ By selecting a target, users can see a ranked leaderboard of Earth analogs. The 
 3. Elevation
 4. Terrain Type
 5. Mineralogy
+
 Instead of just displaying numbers, TerraTwin breaks down the score to show why a site is a strong match, what it lacks, and how it can be used to test specific hardware.
 
 ## Featured Earth Analogs
